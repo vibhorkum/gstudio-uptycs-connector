@@ -1,0 +1,13 @@
+{
+  "dataStudio": {
+    "name": "Uptycs Connector",
+    "company": "Uptycs inc.",
+    "logoUrl": "https://cdn2.hubspot.net/hubfs/2617658/Uptycs_March2018/Images/logo-uptycs.png(8 kB)",
+    "addonUrl": "https://github.com/vibhorkum/gstudio-uptycs-connector/README.md",
+    "supportUrl": "https://github.com/vibhorkum/gstudio-uptycs-connector/README.md",
+    "description": "This connector can be used to connect Uptycs",
+    "shortDescription": "Connector for Uptycs",
+    "authType": ["NONE"],
+    "feeType": ["FREE"]
+  }
+}
