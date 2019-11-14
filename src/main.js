@@ -34,20 +34,16 @@ function getConfig(request) {
   config
     .newTextInput()
     .setId('uptycs_url')
-    .setName('Uptycs URL');
-
-  config
-    .newTextInput()
-    .setId('customer_id')
-    .setName('Customer ID');
+    .setName('Uptycs API URL')
+    .setHelpText('https://<tenant>.uptycs.io/public/api/customers/<customerid>.');
 
   config
     .newTextInput()
     .setId('authorization_bearer')
-    .setName('Authorization Bearer JSON Web token');
+    .setName('Authorization Bearer JSON Web token without Bearer Key');
 
   config
-    .newTextInput()
+    .newTextArea()
     .setId('sql_query')
     .setName('SQL Query');
 

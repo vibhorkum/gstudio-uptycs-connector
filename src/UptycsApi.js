@@ -9,9 +9,6 @@ function validateConfig(configParams) {
   if (!configParams.uptycs_url) {
     throwUserError('Uptycs API URL with customer id.');
   }
-  if (!configParams.customer_id) {
-    throwUserError('Uptycs customer id is missing.');
-  }
   if (!configParams.authorization_bearer) {
     throwUserError('Authorization bearer is empty.');
   }
@@ -43,8 +40,8 @@ function UptycsExecute(request, CallType) {
   var params = request.configParams;
   var QueryJson = { 'type': 'global',
     'query': params.sql_query };
-  var ApiUrl = params.uptycs_url + '/public/api/customers';
-  var QueryJobsUrl = ApiUrl + params.customer_id + '/queryJobs';
+  var ApiUrl = params.uptycs_url;
+  var QueryJobsUrl = ApiUrl + '/queryJobs';
   var ApiHeader = { 'Authorization': 'Bearer ' + params.authorization_bearer };
 
   var PostOptions = {
