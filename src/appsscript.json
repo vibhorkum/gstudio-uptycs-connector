@@ -9,5 +9,9 @@
     "shortDescription": "Uptycs Connector for Data Studio",
     "authType": ["NONE"],
     "feeType": ["FREE"]
-  }
+  },
+  "timeZone": "America/New_York",
+  "dependencies": {
+  },
+  "exceptionLogging": "STACKDRIVER"
 }

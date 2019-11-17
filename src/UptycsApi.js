@@ -87,6 +87,28 @@ function UptycsExecute(request, CallType) {
     }
   }
 
+  // Verify if we got error and throw error message
+  if (GetResponseContent.status === 'ERROR') {
+    if ('error' in GetResponseContent) {
+      var ErrorMsg = '';
+      if ('brief' in GetResponseContent.error) {
+        ErrorMsg = GetResponseContent.error.brief;
+      }
+      if ('detail' in GetResponseContent.error) {
+        ErrorMsg = ErrorMsg + GetResponseContent.error.detail;
+      }
+      throwUserError(ErrorMsg);
+    }
+  }
+
+  // Verify if we have cancelled the query and send the response accordingly
+
+  if (GetResponseContent.status === 'CANCELLED') {
+    var ErrorMsg = 'Query got cancelled';
+    throwUserError(ErrorMsg);
+  }
+
+  // Verify if we have column in JSON and send the response
   if (CallType === 'columns') {
     if (GetResponse.getResponseCode() === 200 &&
         ('columns' in GetResponseContent)) {
