@@ -105,6 +105,11 @@ function UptycsExecute(request, CallType) {
     }
   }
 
+  //check if we got rows or not. If not, return the error.
+  if (GetResponseContent.rowCount === 0) {
+    throwUserError('SQL returned zero rows');
+  }
+
   // Verify if we have column in JSON and send the response
   if (CallType === 'columns') {
     if (GetResponse.getResponseCode() === 200 &&
