@@ -71,41 +71,38 @@ function UptycsExecute(request, CallType) {
   var GetResponse = UrlFetchApp.fetch(QueryIdUrl, GetOptions);
   var GetResponseContent = JSON.parse(GetResponse.getContentText());
 
-  var QueryStatus = false;
-  while (GetResponse.getResponseCode() === 200 && !QueryStatus) {
+  while (GetResponse.getResponseCode() === 200) {
     GetResponse = UrlFetchApp.fetch(QueryIdUrl, GetOptions);
 
     GetResponseContent = JSON.parse(GetResponse.getContentText());
-    console.info(GetResponseContent.status);
+
+    //console.info(GetResponseContent.status);
+
     if (GetResponseContent.status === 'RUNNING') {
-      QueryStatus = false;
-    }
-    if (GetResponseContent.status === 'FINISHED' ||
-           GetResponseContent.status === 'ERROR' ||
-           GetResponseContent.status === 'CANCELLED') {
-      QueryStatus = true;
-    }
-  }
-
-  // Verify if we got error and throw error message
-  if (GetResponseContent.status === 'ERROR') {
-    if ('error' in GetResponseContent) {
-      var ErrorMsg = '';
-      if ('brief' in GetResponseContent.error) {
-        ErrorMsg = GetResponseContent.error.brief;
+      continue;
+    } else if (GetResponseContent.status === 'FINISHED') {
+      break;
+    } else if (GetResponseContent.status === 'ERROR') {
+      if ('error' in GetResponseContent) {
+        var ErrorMsg;
+        if ('message' in GetResponseContent.error) {
+          if ('brief' in GetResponseContent.error.message) {
+            ErrorMsg = GetResponseContent.error.message.brief;
+          }
+          if ('detail' in GetResponseContent.error.message) {
+            ErrorMsg = ErrorMsg + ' ' + GetResponseContent.error.message.detail;
+          }
+        }
+        if (!ErrorMsg) {
+          ErrorMsg = 'Undefined Error';
+        }
+        throwUserError(ErrorMsg);
       }
-      if ('detail' in GetResponseContent.error) {
-        ErrorMsg = ErrorMsg + GetResponseContent.error.detail;
-      }
-      throwUserError(ErrorMsg);
+    } else if (GetResponseContent.status === 'CANCELLED') {
+      throwUserError('Query got cancelled.');
+    } else {
+      throwUserError('Unknown error');
     }
-  }
-
-  // Verify if we have cancelled the query and send the response accordingly
-
-  if (GetResponseContent.status === 'CANCELLED') {
-    var ErrorMsg = 'Query got cancelled';
-    throwUserError(ErrorMsg);
   }
 
   // Verify if we have column in JSON and send the response
@@ -113,15 +110,24 @@ function UptycsExecute(request, CallType) {
     if (GetResponse.getResponseCode() === 200 &&
         ('columns' in GetResponseContent)) {
       return GetResponseContent;
+    } else {
+      throwUserError(GetResponse.getContentText());
     }
   }
 
   if (CallType === 'results') {
-    if (GetResponseContent.status === 'FINISHED') {
+    if (GetResponse.getResponseCode() === 200 &&
+        GetResponseContent.status === 'FINISHED') {
       var QueryIdUrlResults = QueryIdUrl + '/results';
       GetResponse = UrlFetchApp.fetch(QueryIdUrlResults, GetOptions);
-      GetResponseContent = JSON.parse(GetResponse.getContentText());
-      return GetResponseContent;
+      if (GetResponse.getResponseCode() === 200) {
+        GetResponseContent = JSON.parse(GetResponse.getContentText());
+        return GetResponseContent;
+      } else {
+        throwUserError(GetResponse.getContentText());
+      }
+    } else {
+      throwUserError(GetResponse.getContentText());
     }
   }
 }
