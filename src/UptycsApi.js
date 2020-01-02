@@ -7,13 +7,13 @@
 function validateConfig(configParams) {
   configParams = configParams || {};
   if (!configParams.uptycs_url) {
-    throwUserError('Uptycs API URL with customer id.');
+    throwUserError("Uptycs API URL with customer id.");
   }
   if (!configParams.authorization_bearer) {
-    throwUserError('Authorization bearer is empty.');
+    throwUserError("Authorization bearer is empty.");
   }
   if (!configParams.sql_query) {
-    throwUserError('SQL Query is empty.');
+    throwUserError("SQL Query is empty.");
   }
 }
 
@@ -38,25 +38,24 @@ function throwUserError(message) {
 
 function UptycsExecute(request, CallType) {
   var params = request.configParams;
-  var QueryJson = { 'type': 'global',
-    'query': params.sql_query };
+  var QueryJson = { type: "global", query: params.sql_query };
   var ApiUrl = params.uptycs_url;
-  var QueryJobsUrl = ApiUrl + '/queryJobs';
-  var ApiHeader = { 'Authorization': 'Bearer ' + params.authorization_bearer };
+  var QueryJobsUrl = ApiUrl + "/queryJobs";
+  var ApiHeader = { Authorization: "Bearer " + params.authorization_bearer };
 
   var PostOptions = {
-    'headers': ApiHeader,
-    'contentType': 'application/json',
-    'method': 'post',
-    'validateHttpsCertificates': true,
-    'payload': JSON.stringify(QueryJson)
+    headers: ApiHeader,
+    contentType: "application/json",
+    method: "post",
+    validateHttpsCertificates: true,
+    payload: JSON.stringify(QueryJson)
   };
 
   var GetOptions = {
-    'headers': ApiHeader,
-    'contentType': 'application/json',
-    'method': 'get',
-    'validateHttpsCertificates': true
+    headers: ApiHeader,
+    contentType: "application/json",
+    method: "get",
+    validateHttpsCertificates: true
   };
 
   // post the query and get the query id and QueryId URL
@@ -64,7 +63,7 @@ function UptycsExecute(request, CallType) {
   if (PostResponse.getResponseCode() === 200) {
     var PostResponseContent = JSON.parse(PostResponse.getContentText());
     var QueryId = PostResponseContent.id;
-    var QueryIdUrl = QueryJobsUrl + '/' + QueryId;
+    var QueryIdUrl = QueryJobsUrl + "/" + QueryId;
   }
 
   // Check the status of query and capture the the response content
@@ -78,52 +77,56 @@ function UptycsExecute(request, CallType) {
 
     //console.info(GetResponseContent.status);
 
-    if (GetResponseContent.status === 'RUNNING') {
+    if (GetResponseContent.status === "RUNNING") {
       continue;
-    } else if (GetResponseContent.status === 'FINISHED') {
+    } else if (GetResponseContent.status === "FINISHED") {
       break;
-    } else if (GetResponseContent.status === 'ERROR') {
-      if ('error' in GetResponseContent) {
+    } else if (GetResponseContent.status === "ERROR") {
+      if ("error" in GetResponseContent) {
         var ErrorMsg;
-        if ('message' in GetResponseContent.error) {
-          if ('brief' in GetResponseContent.error.message) {
+        if ("message" in GetResponseContent.error) {
+          if ("brief" in GetResponseContent.error.message) {
             ErrorMsg = GetResponseContent.error.message.brief;
           }
-          if ('detail' in GetResponseContent.error.message) {
-            ErrorMsg = ErrorMsg + ' ' + GetResponseContent.error.message.detail;
+          if ("detail" in GetResponseContent.error.message) {
+            ErrorMsg = ErrorMsg + " " + GetResponseContent.error.message.detail;
           }
         }
         if (!ErrorMsg) {
-          ErrorMsg = 'Undefined Error';
+          ErrorMsg = "Undefined Error";
         }
         throwUserError(ErrorMsg);
       }
-    } else if (GetResponseContent.status === 'CANCELLED') {
-      throwUserError('Query got cancelled.');
+    } else if (GetResponseContent.status === "CANCELLED") {
+      throwUserError("Query got cancelled.");
     } else {
-      throwUserError('Unknown error');
+      throwUserError("Unknown error");
     }
   }
 
   //check if we got rows or not. If not, return the error.
   if (GetResponseContent.rowCount === 0) {
-    throwUserError('SQL returned zero rows');
+    throwUserError("SQL returned zero rows");
   }
 
   // Verify if we have column in JSON and send the response
-  if (CallType === 'columns') {
-    if (GetResponse.getResponseCode() === 200 &&
-        ('columns' in GetResponseContent)) {
+  if (CallType === "columns") {
+    if (
+      GetResponse.getResponseCode() === 200 &&
+      "columns" in GetResponseContent
+    ) {
       return GetResponseContent;
     } else {
       throwUserError(GetResponse.getContentText());
     }
   }
 
-  if (CallType === 'results') {
-    if (GetResponse.getResponseCode() === 200 &&
-        GetResponseContent.status === 'FINISHED') {
-      var QueryIdUrlResults = QueryIdUrl + '/results';
+  if (CallType === "results") {
+    if (
+      GetResponse.getResponseCode() === 200 &&
+      GetResponseContent.status === "FINISHED"
+    ) {
+      var QueryIdUrlResults = QueryIdUrl + "/results";
       GetResponse = UrlFetchApp.fetch(QueryIdUrlResults, GetOptions);
       if (GetResponse.getResponseCode() === 200) {
         GetResponseContent = JSON.parse(GetResponse.getContentText());
@@ -146,14 +149,14 @@ function UptycsExecute(request, CallType) {
 
 function getDataFromUptycs(request, schema) {
   validateConfig(request.configParams);
-  var ResponseContent = UptycsExecute(request, 'results');
+  var ResponseContent = UptycsExecute(request, "results");
   var j = 0;
   var rows = [];
   ResponseContent.items.forEach(function(item) {
     var i = 0;
     var row = [];
     schema.forEach(function(colmn) {
-      row[i] = item.rowData[colmn['name']];
+      row[i] = item.rowData[colmn["name"]];
       i = i + 1;
     });
     rows[j] = { values: row };
@@ -182,48 +185,48 @@ function UptycsQueryToFields(UptycsResponse) {
     // Set fields based on data type
     var field;
     switch (column.type.toLowerCase()) {
-    case 'boolean':
-      field = fields
-        .newDimension()
-        .setId(column.name)
-        .setType(types.BOOLEAN);
-      break;
-    case 'number_integer':
-    case 'id':
-      field = fields
-        .newMetric()
-        .setId(column.name)
-        .setType(types.NUMBER);
-      break;
-    case 'char':
-    case 'varchar':
-    case 'string':
-    case 'text':
-    case 'ref':
-      field = fields
-        .newDimension()
-        .setId(column.name)
-        .setType(types.TEXT);
-      break;
-    case 'date':
-      field = fields
-        .newDimension()
-        .setId(column.name)
-        .setType(types.YEAR_MONTH_DAY);
-      break;
-    case 'timestamp':
-    case 'date_time':
-      field = fields
-        .newDimension()
-        .setId(column.name)
-        .setType(types.YEAR_MONTH_DAY_HOUR);
-      break;
-    default:
-      return;
+      case "boolean":
+        field = fields
+          .newDimension()
+          .setId(column.name)
+          .setType(types.BOOLEAN);
+        break;
+      case "number_integer":
+      case "id":
+        field = fields
+          .newMetric()
+          .setId(column.name)
+          .setType(types.NUMBER);
+        break;
+      case "char":
+      case "varchar":
+      case "string":
+      case "text":
+      case "ref":
+        field = fields
+          .newDimension()
+          .setId(column.name)
+          .setType(types.TEXT);
+        break;
+      case "date":
+        field = fields
+          .newDimension()
+          .setId(column.name)
+          .setType(types.YEAR_MONTH_DAY);
+        break;
+      case "timestamp":
+      case "date_time":
+        field = fields
+          .newDimension()
+          .setId(column.name)
+          .setType(types.YEAR_MONTH_DAY_HOUR);
+        break;
+      default:
+        return;
     }
 
     // Set field name and description (if any)
-    if (typeof column.description === 'string') {
+    if (typeof column.description === "string") {
       field.setDescription(column.description);
     }
   });
