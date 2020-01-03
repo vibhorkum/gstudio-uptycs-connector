@@ -32,5 +32,9 @@ sample data.
 2. Generate a JWT using KEY and Secret.
 3. Configure the connector and enter your SQL as given in the below image:
 ![Configure Connector](img/Uptycs_Connector_Configure.png)
+4. Click Connect
+![QuerExecution](img/QueryExecution.png)
 
+### Sample Explorer
+![Sample Explorer](img/Explorer_Snapshot.png)
 
