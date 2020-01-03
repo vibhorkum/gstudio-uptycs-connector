@@ -45,7 +45,7 @@ sample data.
 
 When authorizing the community connector, if you are presented with an
 "unverified" warning screen see [This app isn't verified] for details on how to
-procee
+proceed.
 
 [Data Studio]: https://datastudio.google.com
 [Community Connector]: https://developers.google.com/datastudio/connector
