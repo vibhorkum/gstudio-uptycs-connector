@@ -38,3 +38,21 @@ sample data.
 ### Sample Explorer
 ![Sample Explorer](img/Explorer_Snapshot.png)
 
+
+## Troubleshooting
+
+### This app isn't verified
+
+When authorizing the community connector, if you are presented with an
+"unverified" warning screen see [This app isn't verified] for details on how to
+procee
+
+[Data Studio]: https://datastudio.google.com
+[Community Connector]: https://developers.google.com/datastudio/connector
+[Uptycs]: https://www.uptycs.com
+[deployment guide]: ../deploy.md
+[Use a Community Connector]: https://developers.google.com/datastudio/connector/use
+[revoke access]: https://support.google.com/datastudio/answer/9053467
+[connector list]: https://datastudio.google.com/c/datasources/create
+[creating a new data source]: https://support.google.com/datastudio/answer/6300774
+[This app isn't verified]: ../verification.md
